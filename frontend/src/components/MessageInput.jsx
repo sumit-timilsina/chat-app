@@ -45,7 +45,7 @@ const MessageInput = () => {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 w-full p-4 bg-white shadow-md z-10">
+    <div className="fixed bottom-0 left-0 w-full p-4 bg-gray-100 shadow-md z-10">
       {/* Image preview */}
       {imagePreview && (
         <div className="mb-3 flex items-center gap-2">
@@ -71,7 +71,7 @@ const MessageInput = () => {
         <div className="flex-1 flex gap-2">
           <input
             type="text"
-            className="w-full input input-bordered rounded-lg input-sm sm:input-md"
+            className="w-full input input-bordered rounded-lg input-sm sm:input-md bg-gray-200 text-gray-700"
             placeholder="Type a message..."
             value={text}
             onChange={(e) => setText(e.target.value)}
@@ -101,7 +101,7 @@ const MessageInput = () => {
         {/* Send button */}
         <button
           type="submit"
-          className="btn btn-sm btn-circle"
+          className="btn btn-sm btn-circle bg-blue-500 text-white"
           disabled={!text.trim() && !imagePreview}
         >
           <Send size={22} />

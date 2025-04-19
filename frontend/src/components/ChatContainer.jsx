@@ -1,23 +1,13 @@
+import { useRef, useEffect } from "react";
 import { useChatStore } from "../store/useChatStore";
-import { useEffect, useRef } from "react";
-
-import ChatHeader from "./ChatHeader";
-import MessageInput from "./MessageInput";
-import MessageSkeleton from "./skeletons/MessageSkeleton";
-import { useAuthStore } from "../store/useAuthStore";
+import { useThemeStore } from "../store/useThemeStore";
 import { formatMessageTime } from "../lib/utils";
+import MessageInput from "./MessageInput";
+import ChatHeader from "./ChatHeader";
 
 const ChatContainer = () => {
-  const {
-    messages,
-    getMessages,
-    isMessagesLoading,
-    selectedUser,
-    subscribeToMessages,
-    unsubscribeFromMessages,
-  } = useChatStore();
-
-  const { authUser } = useAuthStore();
+  const { messages, isMessagesLoading, getMessages, selectedUser, subscribeToMessages, unsubscribeFromMessages } = useChatStore();
+  const { theme } = useThemeStore(); // Get the theme from the store
   const messageEndRef = useRef(null);
 
   useEffect(() => {
@@ -35,45 +25,39 @@ const ChatContainer = () => {
 
   if (isMessagesLoading) {
     return (
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className={`flex-1 flex flex-col overflow-hidden bg-base-100`}>
         <ChatHeader />
-        <MessageSkeleton />
-        <MessageInput />
+        {/* Loading skeleton here */}
       </div>
     );
   }
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden">
+    <div className={`flex-1 flex flex-col overflow-hidden bg-base-100 text-base-content`}>
       <ChatHeader />
-
-      <div className="flex-1 overflow-y-auto px-2 sm:px-4 py-4 space-y-4">
+      <div className={`flex-1 overflow-y-auto px-2 sm:px-4 py-4 space-y-4 ${theme === "dark" ? "bg-neutral text-neutral-content" : "bg-base-100"}`}>
         {messages.map((message) => (
           <div
             key={message._id}
-            className={`chat ${
-              message.senderId === authUser._id ? "chat-end" : "chat-start"
-            }`}
+            className={`chat ${message.senderId === selectedUser._id ? "chat-start" : "chat-end"}`}
           >
             <div className="chat-image avatar">
               <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full border">
                 <img
-                  src={
-                    message.senderId === authUser._id
-                      ? authUser.profilePic || "/avatar.png"
-                      : selectedUser.profilePic || "/avatar.png"
-                  }
+                  src={message.senderId === selectedUser._id ? selectedUser.profilePic || "/avatar.png" : "/avatar.png"}
                   alt="profile pic"
                   className="object-cover"
                 />
               </div>
             </div>
-
             <div className="chat-header mb-1 text-xs sm:text-sm opacity-70">
               <time>{formatMessageTime(message.createdAt)}</time>
             </div>
-
-            <div className="chat-bubble flex flex-col max-w-xs sm:max-w-sm md:max-w-md">
+            <div
+              className={`chat-bubble max-w-xs sm:max-w-sm md:max-w-md ${
+                message.senderId === selectedUser._id ? "bg-base-200 text-base-content" : "bg-primary text-primary-content"
+              }`}
+            >
               {message.image && (
                 <img
                   src={message.image}
@@ -85,11 +69,9 @@ const ChatContainer = () => {
             </div>
           </div>
         ))}
-
         {/* Scroll anchor */}
         <div ref={messageEndRef} />
       </div>
-
       <MessageInput />
     </div>
   );
