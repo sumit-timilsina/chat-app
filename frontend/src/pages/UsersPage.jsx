@@ -10,11 +10,7 @@ const UsersPage = () => {
   const isMobile = useMediaQuery({ maxWidth: 768 });
 
   const renderContent = () => {
-    if (isMobile) {
-      if (!selectedUser) return <Sidebar />;
-      return <ChatContainer />;
-    }
-
+   
     return (
       <div className="flex h-full rounded-lg overflow-hidden">
         <Sidebar />
