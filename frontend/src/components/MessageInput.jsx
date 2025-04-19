@@ -45,7 +45,8 @@ const MessageInput = () => {
   };
 
   return (
-    <div className="p-4 w-full">
+    <div className="fixed bottom-0 left-0 w-full p-4 bg-white shadow-md z-10">
+      {/* Image preview */}
       {imagePreview && (
         <div className="mb-3 flex items-center gap-2">
           <div className="relative">
@@ -65,6 +66,7 @@ const MessageInput = () => {
         </div>
       )}
 
+      {/* Message input form */}
       <form onSubmit={handleSendMessage} className="flex items-center gap-2">
         <div className="flex-1 flex gap-2">
           <input
@@ -75,6 +77,7 @@ const MessageInput = () => {
             onChange={(e) => setText(e.target.value)}
           />
 
+          {/* Hidden file input */}
           <input
             type="file"
             accept="image/*"
@@ -83,6 +86,7 @@ const MessageInput = () => {
             onChange={handleImageChange}
           />
 
+          {/* Image button */}
           <button
             type="button"
             className={`flex btn btn-circle btn-sm sm:btn-md ${
@@ -94,6 +98,7 @@ const MessageInput = () => {
           </button>
         </div>
 
+        {/* Send button */}
         <button
           type="submit"
           className="btn btn-sm btn-circle"
