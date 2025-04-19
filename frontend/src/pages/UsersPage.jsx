@@ -1,16 +1,22 @@
 import { useChatStore } from "../store/useChatStore";
 import { useMediaQuery } from "react-responsive";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 import Sidebar from "../components/Sidebar";
-import NoChatSelected from "../components/NoChatSelected";
-import ChatContainer from "../components/ChatContainer";
 
 const UsersPage = () => {
   const { selectedUser } = useChatStore();
   const isMobile = useMediaQuery({ maxWidth: 768 });
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (selectedUser) {
+      navigate("/");
+    }
+  }, [selectedUser, navigate]);
 
   const renderContent = () => {
-   
     return (
       <div className="flex h-full rounded-lg overflow-hidden">
         <Sidebar />
