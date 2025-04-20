@@ -1,108 +1,92 @@
-import { useEffect, useState } from "react";
 import { useChatStore } from "../store/useChatStore";
+import { useEffect, useRef } from "react";
+
+import ChatHeader from "./ChatHeader";
+import MessageInput from "./MessageInput";
+import MessageSkeleton from "./skeletons/MessageSkeleton";
 import { useAuthStore } from "../store/useAuthStore";
-import SidebarSkeleton from "./skeletons/SidebarSkeleton";
-import { Users } from "lucide-react";
-import { useMediaQuery } from "react-responsive";
+import { formatMessageTime } from "../lib/utils";
 
-const Sidebar = () => {
+const ChatContainer = () => {
   const {
-    getUsers,
-    users,
+    messages,
+    getMessages,
+    isMessagesLoading,
     selectedUser,
-    setSelectedUser,
-    isUsersLoading,
+    subscribeToMessages,
+    unsubscribeFromMessages,
   } = useChatStore();
-
-  const { onlineUsers } = useAuthStore();
-  const [showOnlineOnly, setShowOnlineOnly] = useState(false);
-  const isMobile = useMediaQuery({ maxWidth: 768 });
+  const { authUser } = useAuthStore();
+  const messageEndRef = useRef(null);
 
   useEffect(() => {
-    getUsers();
-  }, [getUsers]);
+    getMessages(selectedUser._id);
 
-  const filteredUsers = showOnlineOnly
-    ? users.filter((user) => onlineUsers.includes(user._id))
-    : users;
+    subscribeToMessages();
 
-  if (isUsersLoading) return <SidebarSkeleton />;
+    return () => unsubscribeFromMessages();
+  }, [selectedUser._id, getMessages, subscribeToMessages, unsubscribeFromMessages]);
+
+  useEffect(() => {
+    if (messageEndRef.current && messages) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
+  if (isMessagesLoading) {
+    return (
+      <div className="flex-1 flex flex-col overflow-auto">
+        <ChatHeader />
+        <MessageSkeleton />
+        <MessageInput />
+      </div>
+    );
+  }
 
   return (
-    <aside
-      className={`
-        h-full ${isMobile ? "w-full" : "w-20 lg:w-72"} 
-        border-r border-base-300 flex flex-col transition-all duration-200
-      `}
-    >
-      {!isMobile && (
-        <div className="border-b border-base-300 w-full p-5">
-          <div className="flex items-center gap-2">
-            <Users className="size-6" />
-            <span className="font-medium hidden lg:block">Contacts</span>
-          </div>
+    <div className="flex-1 flex flex-col overflow-auto">
+      <ChatHeader />
 
-          {/* Online filter toggle for desktop */}
-          <div className="mt-3 hidden lg:flex items-center gap-2">
-            <label className="cursor-pointer flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={showOnlineOnly}
-                onChange={(e) => setShowOnlineOnly(e.target.checked)}
-                className="checkbox checkbox-sm"
-              />
-              <span className="text-sm">Show online only</span>
-            </label>
-            <span className="text-xs text-zinc-500">
-              ({onlineUsers.length - 1} online)
-            </span>
-          </div>
-        </div>
-      )}
-
-      <div className="overflow-y-auto w-full py-3">
-        {filteredUsers.map((user) => (
-          <button
-            key={user._id}
-            onClick={() => setSelectedUser(user)}
-            className={`
-              w-full p-3 flex items-center gap-3
-              hover:bg-base-300 transition-colors
-              ${selectedUser?._id === user._id ? "bg-base-300 ring-1 ring-base-300" : ""}
-            `}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.map((message) => (
+          <div
+            key={message._id}
+            className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+            ref={messageEndRef}
           >
-            <div className="relative">
-              <img
-                src={user.profilePic || "/avatar.png"}
-                alt={user.fullName}
-                className="size-12 object-cover rounded-full"
-              />
-              {onlineUsers.includes(user._id) && (
-                <span
-                  className="absolute bottom-0 right-0 size-3 bg-green-500 
-                  rounded-full ring-2 ring-zinc-900"
+            <div className=" chat-image avatar">
+              <div className="size-10 rounded-full border">
+                <img
+                  src={
+                    message.senderId === authUser._id
+                      ? authUser.profilePic || "/avatar.png"
+                      : selectedUser.profilePic || "/avatar.png"
+                  }
+                  alt="profile pic"
+                />
+              </div>
+            </div>
+            <div className="chat-header mb-1">
+              <time className="text-xs opacity-50 ml-1">
+                {formatMessageTime(message.createdAt)}
+              </time>
+            </div>
+            <div className="chat-bubble flex flex-col">
+              {message.image && (
+                <img
+                  src={message.image}
+                  alt="Attachment"
+                  className="sm:max-w-[200px] rounded-md mb-2"
                 />
               )}
+              {message.text && <p>{message.text}</p>}
             </div>
-
-            {/* Always show name; show status only on lg screens */}
-            <div className="flex flex-col min-w-0 overflow-hidden text-left">
-              <span className="truncate font-medium text-sm sm:text-base">
-                {user.fullName}
-              </span>
-              <span className="text-xs text-zinc-400 hidden lg:block">
-                {onlineUsers.includes(user._id) ? "Online" : "Offline"}
-              </span>
-            </div>
-          </button>
+          </div>
         ))}
-
-        {filteredUsers.length === 0 && (
-          <div className="text-center text-zinc-500 py-4">No online users</div>
-        )}
       </div>
-    </aside>
+
+      <MessageInput />
+    </div>
   );
 };
-
-export default Sidebar;
+export default ChatContainer;
