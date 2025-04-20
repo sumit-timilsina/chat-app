@@ -115,7 +115,7 @@ const LoginPage = () => {
       <footer class="bg-gray-800 text-white py-4 fixed bottom-0 w-full">
   <div class="container mx-auto flex justify-between items-center">
     <div class="flex items-center">
-      <a href="https://github.com/sumit-timilsina" target="_blank" class="flex items-center space-x-2">
+      <a href="https://github.com/sumit-timilsina/chat-app.git" target="_blank" class="flex items-center space-x-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-white" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15h2v-2h-2v2zm1-3.25c-.83 0-1.5-.67-1.5-1.5V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v3.25c0 .83-.67 1.5-1.5 1.5z"/>
         </svg>
