@@ -84,8 +84,9 @@ const ChatContainer = () => {
           </div>
         ))}
       </div>
-
+<div className="mt-2">
       <MessageInput />
+</div>
     </div>
   );
 };
